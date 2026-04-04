@@ -1,17 +1,16 @@
 [project]
 name = "nonebot-plugin-group-gatekeeper"
 version = "0.1.0"
-description = "插件描述"
+description = "监听加群请求并通知管理员，通过指令同意/拒绝申请"
 readme = "README.md"
 requires-python = ">=3.10"
-authors = [{ name = "dontdot", email = "dontdot@gmail.com" }]
+authors = [{ name = "dontdot", email = "55482264+dontdot@users.noreply.github.com" }]
 dependencies = [
   "httpx>=0.27.0,<1.0.0",
-  "nonebot-plugin-alconna>=0.60.0,<1.0.0",    # 跨平台命令解析拓展
-  "nonebot-plugin-apscheduler>=0.5.0,<1.0.0", # 定时任务
   "nonebot-plugin-localstore>=0.7.4,<1.0.0",  # 存储文件
-  "nonebot-plugin-uninfo>=0.10.0,<1.0.0",     # 多平台用户信息获取
+  "nonebot-plugin-user-perm>=0.2.0",
   "nonebot2>=2.5.0,<3.0.0",
+  "ruff>=0.15.2",
 ]
 
 [project.urls]
