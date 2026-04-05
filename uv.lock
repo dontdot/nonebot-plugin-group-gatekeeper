@@ -739,7 +739,7 @@ test = [
 requires-dist = [
     { name = "httpx", specifier = ">=0.27.0,<1.0.0" },
     { name = "nonebot-plugin-localstore", specifier = ">=0.7.4,<1.0.0" },
-    { name = "nonebot-plugin-user-perm", specifier = ">=0.2.0" },
+    { name = "nonebot-plugin-user-perm", specifier = "==0.3.0" },
     { name = "nonebot2", specifier = ">=2.5.0,<3.0.0" },
     { name = "ruff", specifier = ">=0.15.2" },
 ]
@@ -785,16 +785,16 @@ wheels = [
 
 [[package]]
 name = "nonebot-plugin-user-perm"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "nonebot-adapter-onebot" },
     { name = "nonebot-plugin-localstore" },
     { name = "nonebot2" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/bd/e8/16753983eba04dabbcaa5e63eb5f89eb8adcaba9947f5459415971745c22/nonebot_plugin_user_perm-0.2.0.tar.gz", hash = "sha256:5ecc12516e221f5ae1b8afd1e4618eb927c24ca804d666437bf1ea7bc386e5f3", size = 5492, upload-time = "2026-04-04T08:37:57.609Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/58/0e/11a7ed1384fdfc300260df0977c1685ea59a2b1ea7bbe55fb916beeacf01/nonebot_plugin_user_perm-0.3.0.tar.gz", hash = "sha256:81e6317263fbd39655ac94c6d178d552379c102382b81d0df45bf76dbc10c560", size = 6178, upload-time = "2026-04-05T16:57:30.763Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/13/02/c0877ee65a0172f1f328ba0a8b93303ccb47a37cee16af4b55e564407425/nonebot_plugin_user_perm-0.2.0-py3-none-any.whl", hash = "sha256:b4e0db27419946a0c564046515dd327dae7111543abdfb35fb2d991df1af246f", size = 5237, upload-time = "2026-04-04T08:37:58.345Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/1c/827659d817ed0e83a7a3da0a66fb95f1d17df839cbc2c9cefb3b4856a754/nonebot_plugin_user_perm-0.3.0-py3-none-any.whl", hash = "sha256:571217c037d67049929badef53b80e90acf7abdfdb96ff196e69a9649b228ed3", size = 5947, upload-time = "2026-04-05T16:57:29.745Z" },
 ]
 
 [[package]]
