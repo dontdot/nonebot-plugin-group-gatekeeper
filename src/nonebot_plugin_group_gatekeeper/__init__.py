@@ -52,6 +52,7 @@ class GroupRequestInfo:
         nickname: str,
         avatar_url: str,
         group_id: int,
+        comment: str | None,
         flag: str,
     ):
         self.request_id = request_id
@@ -59,6 +60,7 @@ class GroupRequestInfo:
         self.nickname = nickname
         self.avatar_url = avatar_url
         self.group_id = group_id
+        self.comment = comment
         self.flag = flag
         self.status = "pending"
         self.create_time: int | None = None
@@ -70,6 +72,7 @@ class GroupRequestInfo:
             "nickname": self.nickname,
             "avatar_url": self.avatar_url,
             "group_id": self.group_id,
+            "comment": self.comment,
             "flag": self.flag,
             "status": self.status,
             "create_time": self.create_time,
@@ -83,6 +86,7 @@ class GroupRequestInfo:
             nickname=data["nickname"],
             avatar_url=data["avatar_url"],
             group_id=data["group_id"],
+            comment=data["comment"],
             flag=data["flag"],
         )
         obj.status = data.get("status", "pending")
@@ -235,6 +239,7 @@ async def handle_group_request(bot: Bot, event: GroupRequestEvent, state: T_Stat
 
     group_id = event.group_id
     user_id = event.user_id
+    comment = event.comment
     flag = event.flag
 
     nickname, avatar_url = await get_user_info(bot, user_id)
@@ -248,6 +253,7 @@ async def handle_group_request(bot: Bot, event: GroupRequestEvent, state: T_Stat
         nickname=nickname,
         avatar_url=avatar_url,
         group_id=group_id,
+        comment=comment,
         flag=flag,
     )
     req.create_time = int(time.time())
@@ -266,7 +272,8 @@ async def handle_group_request(bot: Bot, event: GroupRequestEvent, state: T_Stat
             MessageSegment.text(f"QQ号：{user_id}\n"),
             MessageSegment.text(f"昵称：{nickname}\n"),
             MessageSegment.image(avatar_url),
-            MessageSegment.text(f"\n编号：[{index}]\n"),
+            MessageSegment.text(f"\n申请理由：{comment}\n"),
+            MessageSegment.text(f"编号：[{index}]\n"),
             MessageSegment.text("━━━━━━━━━━━━━━\n"),
             MessageSegment.text("处理指令：\n"),
             MessageSegment.text(f"  同意：/群管 同意 {index} \n"),
