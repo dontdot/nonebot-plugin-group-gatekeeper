@@ -1,8 +1,10 @@
 import json
+import time
 from typing import Any
 from pathlib import Path
 
 from nonebot import require, get_driver, on_command, on_request
+from pydantic import BaseModel
 from nonebot.log import logger
 from nonebot.params import CommandArg
 from nonebot.plugin import PluginMetadata
@@ -44,54 +46,23 @@ __plugin_meta__ = PluginMetadata(
 driver = get_driver()
 
 
-class GroupRequestInfo:
-    def __init__(
-        self,
-        request_id: str,
-        user_id: int,
-        nickname: str,
-        avatar_url: str,
-        group_id: int,
-        comment: str | None,
-        flag: str,
-    ):
-        self.request_id = request_id
-        self.user_id = user_id
-        self.nickname = nickname
-        self.avatar_url = avatar_url
-        self.group_id = group_id
-        self.comment = comment
-        self.flag = flag
-        self.status = "pending"
-        self.create_time: int | None = None
+class GroupRequestInfo(BaseModel):
+    request_id: str = ""
+    user_id: int  # event
+    nickname: str = ""
+    avatar_url: str = ""
+    group_id: int  # event
+    comment: str = ""  # event
+    flag: str  # event
+    status: str = "pending"
+    create_time: int | None = 0
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "request_id": self.request_id,
-            "user_id": self.user_id,
-            "nickname": self.nickname,
-            "avatar_url": self.avatar_url,
-            "group_id": self.group_id,
-            "comment": self.comment,
-            "flag": self.flag,
-            "status": self.status,
-            "create_time": self.create_time,
-        }
+        return self.model_dump()
 
     @classmethod
     def from_dict(cls, data: dict[str, Any]) -> "GroupRequestInfo":
-        obj = cls(
-            request_id=data["request_id"],
-            user_id=data["user_id"],
-            nickname=data["nickname"],
-            avatar_url=data["avatar_url"],
-            group_id=data["group_id"],
-            comment=data["comment"],
-            flag=data["flag"],
-        )
-        obj.status = data.get("status", "pending")
-        obj.create_time: int | None = data.get("create_time")
-        return obj
+        return cls(**data)
 
 
 class RequestStorage:
@@ -203,14 +174,15 @@ class RequestStorage:
 storage = RequestStorage()
 
 
-async def cleanup_on_startup():
+async def cleanup_on_startup(bot):
     """插件启动时清理已入群用户"""
     try:
-        global driver
-        bots = driver.bots
-        if bots:
-            bot = next(iter(bots.values()))
-            await storage.cleanup_joined_users(bot)
+        # global driver
+        # bots = driver.bots
+        # logger.debug(f"查看bots{bots}")
+        # if bots:
+            # bot = next(iter(bots.values()))
+        await storage.cleanup_joined_users(bot)
     except Exception as e:
         logger.error(f"启动清理失败: {e}")
 
@@ -236,26 +208,12 @@ group_request_matcher = on_request(priority=1)
 async def handle_group_request(bot: Bot, event: GroupRequestEvent, state: T_State):
     if event.sub_type != "add":
         return
+    logger.debug(event.model_dump())
 
-    group_id = event.group_id
-    user_id = event.user_id
-    comment = event.comment
-    flag = event.flag
+    req = GroupRequestInfo(**event.model_dump())
 
-    nickname, avatar_url = await get_user_info(bot, user_id)
-
-    import time
-
-    request_id = f"{group_id}_{user_id}_{int(time.time())}"
-    req = GroupRequestInfo(
-        request_id=request_id,
-        user_id=user_id,
-        nickname=nickname,
-        avatar_url=avatar_url,
-        group_id=group_id,
-        comment=comment,
-        flag=flag,
-    )
+    req.request_id = f"{event.group_id}_{event.user_id}_{int(time.time())}"
+    req.nickname, req.avatar_url = await get_user_info(bot, event.user_id)
     req.create_time = int(time.time())
     storage.add_request(req)
 
@@ -269,10 +227,10 @@ async def handle_group_request(bot: Bot, event: GroupRequestEvent, state: T_Stat
     msg = Message(
         [
             MessageSegment.text("📢 新的进群申请\n"),
-            MessageSegment.text(f"QQ号：{user_id}\n"),
-            MessageSegment.text(f"昵称：{nickname}\n"),
-            MessageSegment.image(avatar_url),
-            MessageSegment.text(f"\n申请理由：{comment}\n"),
+            MessageSegment.text(f"QQ号：{req.user_id}\n"),
+            MessageSegment.text(f"昵称：{req.nickname}\n"),
+            MessageSegment.image(req.avatar_url),
+            MessageSegment.text(f"\n申请理由：{req.comment}\n"),
             MessageSegment.text(f"编号：[{index}]\n"),
             MessageSegment.text("━━━━━━━━━━━━━━\n"),
             MessageSegment.text("处理指令：\n"),
@@ -281,7 +239,7 @@ async def handle_group_request(bot: Bot, event: GroupRequestEvent, state: T_Stat
             *[MessageSegment.at(id) for id in users if id is not None],
         ]
     )
-    await bot.send_group_msg(group_id=group_id, message=msg)
+    await bot.send_group_msg(group_id=event.group_id, message=msg)
 
 
 ADMIN_PERMISSION = GROUP_ADMIN | GROUP_OWNER | SUPERUSER | Permission(upm.is_perm_user)
