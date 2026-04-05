@@ -181,7 +181,7 @@ async def cleanup_on_startup(bot):
         # bots = driver.bots
         # logger.debug(f"查看bots{bots}")
         # if bots:
-            # bot = next(iter(bots.values()))
+        #     bot = next(iter(bots.values()))
         await storage.cleanup_joined_users(bot)
     except Exception as e:
         logger.error(f"启动清理失败: {e}")
